@@ -32,15 +32,15 @@ const themes: ThemeConfig[] = [
     text: '#1f2937',
   },
   {
-    id: 'professional',
-    name: '专业',
+    id: 'dark',
+    name: '暗黑',
     bg: '#1f2937',
     border: '#6366f1',
     text: '#f9fafb',
   },
   {
-    id: 'playful',
-    name: '活泼',
+    id: 'colorful',
+    name: '彩色',
     bg: '#fef3c7',
     border: '#f59e0b',
     text: '#78350f',
@@ -71,7 +71,8 @@ function selectTheme(themeId: ThemeId): void {
 
 .theme-label {
   font-size: 13px;
-  color: #666;
+  color: #6b7280;
+  font-weight: 500;
 }
 
 .theme-options {
@@ -80,32 +81,27 @@ function selectTheme(themeId: ThemeId): void {
 }
 
 .theme-btn {
-  width: 48px;
-  height: 32px;
-  border-radius: 6px;
+  padding: 6px 12px;
   border: 2px solid var(--theme-border);
+  border-radius: 6px;
   background: var(--theme-bg);
   color: var(--theme-text);
-  font-size: 11px;
-  font-weight: 500;
   cursor: pointer;
+  font-size: 12px;
+  font-weight: 500;
   transition: all 0.2s;
-  display: flex;
-  align-items: center;
-  justify-content: center;
 }
 
 .theme-btn:hover {
-  transform: scale(1.05);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
 .theme-btn.active {
-  border-width: 3px;
-  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.3);
+  box-shadow: 0 0 0 2px var(--theme-border);
 }
 
 .theme-name {
-  pointer-events: none;
+  white-space: nowrap;
 }
 </style>

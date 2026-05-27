@@ -43,16 +43,19 @@
 <script setup lang="ts">
 import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { useMindmapStore } from '../../stores/mindmap'
-import type { MindmapNode, ExportType } from '@/types/mindmap'
+import type { ExportType } from '@/types/mindmap'
 import ThemeSelector from '../theme/ThemeSelector.vue'
 
 const emit = defineEmits<{
   export: [type: ExportType]
+  zoomIn: []
+  zoomOut: []
+  resetView: []
 }>()
 
 const props = defineProps<{
-  mindmapRef: { svgRef: SVGSVGElement | null; zoomIn: () => void; zoomOut: () => void; resetView: () => void; getLayoutSize: () => { width: number; height: number } } | null
-  treeData: MindmapNode | null
+  mindmapRef: { fit: () => void; zoomIn: () => void; zoomOut: () => void; reset: () => void } | null
+  markdown: string
 }>()
 
 const store = useMindmapStore()
@@ -62,15 +65,15 @@ const showExportMenu = ref<boolean>(false)
 const zoom = computed(() => store.zoomLevel)
 
 function resetView(): void {
-  props.mindmapRef?.resetView()
+  emit('resetView')
 }
 
 function zoomIn(): void {
-  props.mindmapRef?.zoomIn()
+  emit('zoomIn')
 }
 
 function zoomOut(): void {
-  props.mindmapRef?.zoomOut()
+  emit('zoomOut')
 }
 
 function handleExport(type: ExportType): void {
@@ -147,9 +150,7 @@ onUnmounted(() => {
   cursor: pointer;
   font-size: 13px;
   transition: all 0.2s;
-  display: flex;
-  align-items: center;
-  gap: 4px;
+  white-space: nowrap;
 }
 
 .tool-btn:hover {
@@ -164,10 +165,10 @@ onUnmounted(() => {
 }
 
 .zoom-level {
+  font-size: 13px;
+  color: #6b7280;
   min-width: 48px;
   text-align: center;
-  font-size: 12px;
-  color: #666;
 }
 
 .divider {
@@ -200,29 +201,25 @@ onUnmounted(() => {
   background: white;
   border: 1px solid #e5e7eb;
   border-radius: 8px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-  overflow: hidden;
-  z-index: 100;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+  padding: 4px 0;
   min-width: 140px;
+  z-index: 1000;
 }
 
 .export-item {
   display: block;
   width: 100%;
-  padding: 10px 16px;
+  padding: 8px 12px;
   border: none;
   background: none;
-  text-align: left;
   cursor: pointer;
   font-size: 13px;
-  transition: background 0.2s;
+  text-align: left;
+  transition: background 0.15s;
 }
 
 .export-item:hover {
   background: #f3f4f6;
-}
-
-.export-item + .export-item {
-  border-top: 1px solid #f3f4f6;
 }
 </style>

@@ -3,8 +3,8 @@
  */
 
 import { defineStore } from 'pinia'
-import { ref, computed } from 'vue'
-import type { MindmapNode, LayoutDirection, ThemeId, ThemeVariables } from '@/types/mindmap'
+import { ref } from 'vue'
+import type { ThemeId, ThemeVariables } from '@/types/mindmap'
 
 // 默认 Markdown 内容
 const DEFAULT_MARKDOWN = `# 思维导图标题
@@ -34,38 +34,17 @@ export const useMindmapStore = defineStore('mindmap', () => {
   // Markdown 内容
   const markdownContent = ref<string>(DEFAULT_MARKDOWN)
 
-  // 思维导图数据（树形结构）
-  const mindmapData = ref<MindmapNode | null>(null)
-
   // 当前主题
   const currentTheme = ref<ThemeId>('classic')
 
   // 缩放级别
   const zoomLevel = ref<number>(1)
 
-  // 画布偏移
-  const panOffset = ref<{ x: number; y: number }>({ x: 0, y: 0 })
-
-  // 折叠的节点 ID 集合
-  const collapsedNodes = ref<Set<string>>(new Set())
-
-  // 布局方向
-  const layoutDirection = ref<LayoutDirection>('horizontal')
-
-  // ============ 计算属性 ============
-
-  const isCollapsed = computed(() => (nodeId: string) => collapsedNodes.value.has(nodeId))
-
   // ============ 方法 ============
 
   // 更新 Markdown 内容
   function updateMarkdown(content: string): void {
     markdownContent.value = content
-  }
-
-  // 更新思维导图数据
-  function updateMindmapData(data: MindmapNode | null): void {
-    mindmapData.value = data
   }
 
   // 切换主题
@@ -79,86 +58,80 @@ export const useMindmapStore = defineStore('mindmap', () => {
     const root = document.documentElement
     const themes: Record<ThemeId, ThemeVariables> = {
       classic: {
+        '--bg-color': '#f8fafc',
+        '--panel-bg': '#ffffff',
+        '--header-bg': '#f1f5f9',
+        '--border-color': '#e2e8f0',
+        '--text-primary': '#1e293b',
+        '--text-secondary': '#64748b',
+        '--hover-bg': '#e2e8f0',
         '--node-bg': '#ffffff',
-        '--node-border': '#3b82f6',
-        '--node-text': '#1f2937',
-        '--line-color': '#93c5fd',
+        '--node-border': '#e2e8f0',
+        '--node-text': '#1e293b',
         '--root-bg': '#3b82f6',
         '--root-text': '#ffffff',
       },
-      professional: {
-        '--node-bg': '#1f2937',
-        '--node-border': '#6366f1',
-        '--node-text': '#f9fafb',
-        '--line-color': '#6366f1',
-        '--root-bg': '#6366f1',
+      dark: {
+        '--bg-color': '#0f172a',
+        '--panel-bg': '#1e293b',
+        '--header-bg': '#334155',
+        '--border-color': '#475569',
+        '--text-primary': '#f1f5f9',
+        '--text-secondary': '#94a3b8',
+        '--hover-bg': '#334155',
+        '--node-bg': '#1e293b',
+        '--node-border': '#475569',
+        '--node-text': '#f1f5f9',
+        '--root-bg': '#3b82f6',
         '--root-text': '#ffffff',
       },
-      playful: {
-        '--node-bg': '#fef3c7',
-        '--node-border': '#f59e0b',
-        '--node-text': '#78350f',
-        '--line-color': '#fcd34d',
-        '--root-bg': '#f59e0b',
+      colorful: {
+        '--bg-color': '#fff7ed',
+        '--panel-bg': '#ffffff',
+        '--header-bg': '#ffedd5',
+        '--border-color': '#fed7aa',
+        '--text-primary': '#7c2d12',
+        '--text-secondary': '#c2410c',
+        '--hover-bg': '#ffedd5',
+        '--node-bg': '#ffffff',
+        '--node-border': '#fdba74',
+        '--node-text': '#7c2d12',
+        '--root-bg': '#f97316',
         '--root-text': '#ffffff',
       },
     }
-    const t = themes[theme] || themes.classic
-    Object.entries(t).forEach(([key, value]) => {
-      root.style.setProperty(key, value)
-    })
-  }
 
-  // 切换节点折叠状态
-  function toggleCollapse(nodeId: string): void {
-    if (collapsedNodes.value.has(nodeId)) {
-      collapsedNodes.value.delete(nodeId)
-    } else {
-      collapsedNodes.value.add(nodeId)
+    const themeVars = themes[theme]
+    if (themeVars) {
+      Object.entries(themeVars).forEach(([key, value]) => {
+        root.style.setProperty(key, value)
+      })
     }
+
+    // 设置 data-theme 属性
+    root.setAttribute('data-theme', theme === 'dark' ? 'dark' : 'light')
   }
 
-  // 设置缩放
-  function setZoom(level: number): void {
-    zoomLevel.value = Math.max(0.1, Math.min(3, level))
+  // 设置缩放级别
+  function setZoomLevel(level: number): void {
+    zoomLevel.value = Math.max(0.1, Math.min(5, level))
   }
 
-  // 设置画布偏移
-  function setPan(x: number, y: number): void {
-    panOffset.value = { x, y }
-  }
-
-  // 重置视图
-  function resetView(): void {
-    zoomLevel.value = 1
-    panOffset.value = { x: 0, y: 0 }
-  }
-
-  // 切换布局方向
-  function toggleLayoutDirection(): void {
-    layoutDirection.value = layoutDirection.value === 'horizontal' ? 'vertical' : 'horizontal'
+  // 初始化主题
+  function initTheme(): void {
+    applyTheme(currentTheme.value)
   }
 
   return {
     // 状态
     markdownContent,
-    mindmapData,
     currentTheme,
     zoomLevel,
-    panOffset,
-    collapsedNodes,
-    layoutDirection,
-    // 计算
-    isCollapsed,
+
     // 方法
     updateMarkdown,
-    updateMindmapData,
     setTheme,
-    applyTheme,
-    toggleCollapse,
-    setZoom,
-    setPan,
-    resetView,
-    toggleLayoutDirection,
+    setZoomLevel,
+    initTheme,
   }
 })

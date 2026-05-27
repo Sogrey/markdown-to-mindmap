@@ -43,7 +43,7 @@ export interface LayoutResult {
 export type LayoutDirection = 'horizontal' | 'vertical'
 
 // 主题类型
-export type ThemeId = 'classic' | 'professional' | 'playful'
+export type ThemeId = 'classic' | 'dark' | 'colorful'
 
 // 主题配置
 export interface ThemeConfig {
@@ -56,12 +56,7 @@ export interface ThemeConfig {
 
 // 主题变量
 export interface ThemeVariables {
-  '--node-bg': string
-  '--node-border': string
-  '--node-text': string
-  '--line-color': string
-  '--root-bg': string
-  '--root-text': string
+  [key: string]: string
 }
 
 // 导出类型
